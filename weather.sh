@@ -8,6 +8,8 @@ TRIMMED_LONG=$(echo $LONG | bc -l | xargs printf "%.2f" )
 
 WEATHER_RESPONSE=$(curl --location --request GET https://api.weather.gov/points/${TRIMMED_LAT},${TRIMMED_LONG})
 FORECAST_DRILL_URL=$(echo $WEATHER_RESPONSE | jq '.properties.forecast')
+CITY=$(echo $WEATHER_RESPONSE | jq '.properties.relativeLocation.properties.city')
+STATE=$(echo $WEATHER_RESPONSE | jq '.properties.relativeLocation.properties.state')
 
 # sed after pipe removes quotes for echo formatting to curl
 FORECAST_RESPONSE=$(curl --location --request GET $(echo $FORECAST_DRILL_URL | sed -e 's/^"//' -e 's/"$//'))
@@ -17,6 +19,8 @@ LOW_TEMP=$(echo $FORECAST_RESPONSE | jq '.properties.periods[1].temperature')
 
 # Print out
 echo $ZIP_CODE
+echo $CITY | sed -e 's/^"//' -e 's/"$//'
+echo $STATE | sed -e 's/^"//' -e 's/"$//'
 
 echo $LAT
 echo $TRIMMED_LAT
