@@ -60,24 +60,22 @@ FORECAST_RESPONSE=$(curl -s --location --request GET $(echo $FORECAST_DRILL_URL 
 HIGH_TEMP=$(echo $FORECAST_RESPONSE | jq '.properties.periods[0].temperature')
 LOW_TEMP=$(echo $FORECAST_RESPONSE | jq '.properties.periods[1].temperature')
 
-# Print out
-echo $ZIPCODE
 
 nq_CITY=$(echo $CITY | sed -e 's/^"//' -e 's/"$//')
 nq_STATE=$(echo $STATE | sed -e 's/^"//' -e 's/"$//')
 
+# Generates Random background color for City/State text
+RANDOM_NUMBER=$((1 + RANDOM % 7))
 
-echo $HIGH_TEMP 
-echo $LOW_TEMP
-
-# FLASHING_YELLOW='\033[5;33m'
-FLASHING_YELLOW='\033[5;43m'
+# Text coloring
+FLASHING_BACKGROUND='\033[5;4'+$(echo $RANDOM_NUMBER)+'m'
 BOLD_BLUE='\033[1;35m'
 ITALICIZED='\033[3m'
 ENDCOLOR='\033[0m'
 
 echo "             🌎 
             "
-echo "   In ${FLASHING_YELLOW} ${nq_CITY}, ${nq_STATE} ${ENDCOLOR} today "
+echo "   In ${FLASHING_BACKGROUND} ${nq_CITY}, ${nq_STATE} ${ENDCOLOR} today "
 echo "☀️    The ${ITALICIZED}high${ENDCOLOR} temperature will be ${BOLD_BLUE}${HIGH_TEMP}°F${ENDCOLOR}.🌡️"
 echo "🌙   The ${ITALICIZED}low${ENDCOLOR} will be ${BOLD_BLUE}${LOW_TEMP}°F${ENDCOLOR}.🌡️"
+
