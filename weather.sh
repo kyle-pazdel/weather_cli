@@ -1,4 +1,4 @@
-# Flag options and usage function
+# Flag options and usage functions
 function usage() {
     cat <<USAGE
 
@@ -42,32 +42,42 @@ done
 # Geocode From Zip
 ZIP_RESPONSE=$(curl -s --location --request GET https://geocoding-api.open-meteo.com/v1/search?name=$ZIPCODE&count=1&language=en&format=json)
 LAT=$(echo $ZIP_RESPONSE | jq '.results[0].latitude')
-TRIMMED_LAT=$(echo $LAT | bc -l | xargs printf "%.2f" )
 LONG=$(echo $ZIP_RESPONSE | jq '.results[0].longitude')
+
+# Truncates lat and lang to first two decimal places
+TRIMMED_LAT=$(echo $LAT | bc -l | xargs printf "%.2f" )
 TRIMMED_LONG=$(echo $LONG | bc -l | xargs printf "%.2f" )
 
+# Calls NWS API to gain point data and url for location
 WEATHER_RESPONSE=$(curl -s --location --request GET https://api.weather.gov/points/${TRIMMED_LAT},${TRIMMED_LONG})
 FORECAST_DRILL_URL=$(echo $WEATHER_RESPONSE | jq '.properties.forecast')
 CITY=$(echo $WEATHER_RESPONSE | jq '.properties.relativeLocation.properties.city')
 STATE=$(echo $WEATHER_RESPONSE | jq '.properties.relativeLocation.properties.state')
 
-# sed after pipe removes quotes for echo formatting to curl
-FORECAST_RESPONSE=$(curl -s --location --request GET $(echo $FORECAST_DRILL_URL | sed -e 's/^"//' -e 's/"$//'))
+# Makes second call to NWS API to get temp data for location
+FORECAST_RESPONSE=$(curl -s --location --request GET $(echo $FORECAST_DRILL_URL | sed -e 's/^"//' -e 's/"$//')) # sed after pipe removes quotes for echo formatting to curl
 
 HIGH_TEMP=$(echo $FORECAST_RESPONSE | jq '.properties.periods[0].temperature')
 LOW_TEMP=$(echo $FORECAST_RESPONSE | jq '.properties.periods[1].temperature')
 
 # Print out
 echo $ZIPCODE
-echo $CITY | sed -e 's/^"//' -e 's/"$//'
-echo $STATE | sed -e 's/^"//' -e 's/"$//'
 
-echo $LAT
-echo $TRIMMED_LAT
-echo $LONG
-echo $TRIMMED_LONG
+nq_CITY=$(echo $CITY | sed -e 's/^"//' -e 's/"$//')
+nq_STATE=$(echo $STATE | sed -e 's/^"//' -e 's/"$//')
+
 
 echo $HIGH_TEMP 
-echo $LOW_TEMP 
+echo $LOW_TEMP
 
+# FLASHING_YELLOW='\033[5;33m'
+FLASHING_YELLOW='\033[5;43m'
+BOLD_BLUE='\033[1;35m'
+ITALICIZED='\033[3m'
+ENDCOLOR='\033[0m'
 
+echo "             🌎 
+            "
+echo "   In ${FLASHING_YELLOW} ${nq_CITY}, ${nq_STATE} ${ENDCOLOR} today "
+echo "☀️    The ${ITALICIZED}high${ENDCOLOR} temperature will be ${BOLD_BLUE}${HIGH_TEMP}°F${ENDCOLOR}.🌡️"
+echo "🌙   The ${ITALICIZED}low${ENDCOLOR} will be ${BOLD_BLUE}${LOW_TEMP}°F${ENDCOLOR}.🌡️"
