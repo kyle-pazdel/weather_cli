@@ -12,7 +12,8 @@ FORECAST_DRILL_URL=$(echo $WEATHER_RESPONSE | jq '.properties.forecast')
 # sed after pipe removes quotes for echo formatting to curl
 FORECAST_RESPONSE=$(curl --location --request GET $(echo $FORECAST_DRILL_URL | sed -e 's/^"//' -e 's/"$//'))
 
-
+HIGH_TEMP=$(echo $FORECAST_RESPONSE | jq '.properties.periods[0].temperature')
+LOW_TEMP=$(echo $FORECAST_RESPONSE | jq '.properties.periods[1].temperature')
 
 # Print out
 echo $ZIP_CODE
@@ -22,5 +23,5 @@ echo $TRIMMED_LAT
 echo $LONG
 echo $TRIMMED_LONG
 
-echo $FORECAST_DRILL_URL
-echo $FORECAST_RESPONSE | jq '.'
+echo $HIGH_TEMP 
+echo $LOW_TEMP 
