@@ -1,3 +1,5 @@
+## EXECUTE THIS COMMAND IN COMMAND LINE TO ENABLE EXECUTION PERMISSIONS FOR THIS FILE: "chmod +x ./weather.sh"
+
 # Flag options and usage functions
 function usage() {
     cat <<USAGE
